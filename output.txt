@@ -1,0 +1,66 @@
+========================================
+TASK 1: LOGIN
+========================================
+
+Command:
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"dhruv@gmail.com","password":"password123"}'
+
+Response:
+{
+    "message": "OTP sent",
+    "loginSessionId": "vvc2gd",
+    "otp": 606642
+}
+
+
+========================================
+TASK 2: VERIFY OTP
+========================================
+
+Command:
+curl -c cookies.txt -X POST http://localhost:3000/auth/verify-otp \
+  -H "Content-Type: application/json" \
+  -d '{"loginSessionId":"vvc2gd","otp":"606642"}'
+
+Response:
+{
+    "message": "OTP verified",
+    "sessionId": "vvc2gd"
+}
+
+
+========================================
+TASK 3: GENERATE ACCESS TOKEN
+========================================
+
+Command:
+curl -b cookies.txt -X POST http://localhost:3000/auth/token
+
+Response:
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRocnV2QGdtYWlsLmNvbSIsInNlc3Npb25JZCI6InZ2YzJnZCIsImlhdCI6MTc3MDkwMjUwMSwiZXhwIjoxNzcwOTAzNDAxfQ.GJzY2Th77el6n910RPsHKl7NmGVNjefzNtC_TuleA_k",
+    "expires_in": 900
+}
+
+
+========================================
+TASK 4: ACCESS PROTECTED ROUTE
+========================================
+
+Command:
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRocnV2QGdtYWlsLmNvbSIsInNlc3Npb25JZCI6InZ2YzJnZCIsImlhdCI6MTc3MDkwMjUwMSwiZXhwIjoxNzcwOTAzNDAxfQ.GJzY2Th77el6n910RPsHKl7NmGVNjefzNtC_TuleA_k" \
+http://localhost:3000/protected
+
+Response:
+{
+    "message": "Access granted",
+    "user": {
+        "email": "dhruv@gmail.com",
+        "sessionId": "vvc2gd",
+        "iat": 1770902501,
+        "exp": 1770903401
+    },
+    "success_flag": "FLAG-ZGhydXZAZ21haWwuY29tX0NPTVBMRVRFRF9BU1NJR05NRU5U"
+}

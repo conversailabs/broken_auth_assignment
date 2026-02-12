@@ -5,8 +5,11 @@ const requestLogger = require("./middleware/logger");
 const authMiddleware = require("./middleware/auth");
 const { generateToken } = require("./utils/tokenGenerator");
 
+require('dotenv').config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.use(cookieParser());
 
 // Session storage (in-memory)
 const loginSessions = {};
@@ -49,11 +52,12 @@ app.post("/auth/login", (req, res) => {
     // Store OTP
     otpStore[loginSessionId] = otp;
 
-    console.log(`[OTP] Session ${loginSessionId} generated`);
+    console.log(`${otp} Session ${loginSessionId} generated`);
 
     return res.status(200).json({
       message: "OTP sent",
       loginSessionId,
+      otp
     });
   } catch (error) {
     return res.status(500).json({
@@ -83,9 +87,11 @@ app.post("/auth/verify-otp", (req, res) => {
       return res.status(401).json({ error: "Session expired" });
     }
 
-    if (parseInt(otp) !== otpStore[loginSessionId]) {
+    if (!otpStore[loginSessionId] || Number(otp) !== Number(otpStore[loginSessionId])) {
       return res.status(401).json({ error: "Invalid OTP" });
     }
+
+    loginSessions[loginSessionId].verified = true;
 
     res.cookie("session_token", loginSessionId, {
       httpOnly: true,
@@ -109,7 +115,7 @@ app.post("/auth/verify-otp", (req, res) => {
 
 app.post("/auth/token", (req, res) => {
   try {
-    const token = req.headers.authorization;
+    const token = req.cookies.session_token;
 
     if (!token) {
       return res
@@ -117,10 +123,14 @@ app.post("/auth/token", (req, res) => {
         .json({ error: "Unauthorized - valid session required" });
     }
 
-    const session = loginSessions[token.replace("Bearer ", "")];
+    const session = loginSessions[token];
 
     if (!session) {
       return res.status(401).json({ error: "Invalid session" });
+    }
+
+    if(!session.verified){
+      return res.status(401).json({ error: "OTP not verified" });
     }
 
     // Generate JWT
@@ -136,6 +146,12 @@ app.post("/auth/token", (req, res) => {
         expiresIn: "15m",
       }
     );
+
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    });
 
     return res.status(200).json({
       access_token: accessToken,
