@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const requestLogger = require("./middleware/logger");
 const authMiddleware = require("./middleware/auth");
 const { generateToken } = require("./utils/tokenGenerator");
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,11 +16,13 @@ const otpStore = {};
 
 // Middleware
 app.use(requestLogger);
+app.use(cookieParser());
 app.use(express.json());
 
 
-app.get("/", (req, res) => {
-  res.json({
+app.get("/", async(req, res) => {
+  res.status(200).json({
+    message: "Assessment Solution",
     challenge: "Complete the Authentication Flow",
     instruction:
       "Complete the authentication flow and obtain a valid access token.",
@@ -54,6 +58,7 @@ app.post("/auth/login", (req, res) => {
     return res.status(200).json({
       message: "OTP sent",
       loginSessionId,
+      otp: otpStore[loginSessionId]
     });
   } catch (error) {
     return res.status(500).json({
@@ -109,15 +114,14 @@ app.post("/auth/verify-otp", (req, res) => {
 
 app.post("/auth/token", (req, res) => {
   try {
-    const token = req.headers.authorization;
-
-    if (!token) {
+    const session_token = req.cookies.session_token;
+    if (!session_token) {
       return res
         .status(401)
         .json({ error: "Unauthorized - valid session required" });
     }
 
-    const session = loginSessions[token.replace("Bearer ", "")];
+    const session = loginSessions[session_token];
 
     if (!session) {
       return res.status(401).json({ error: "Invalid session" });
@@ -129,7 +133,7 @@ app.post("/auth/token", (req, res) => {
     const accessToken = jwt.sign(
       {
         email: session.email,
-        sessionId: token,
+        sessionId: session_token,
       },
       secret,
       {

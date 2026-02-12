@@ -1,0 +1,30 @@
+EndPoint: POST /auth/login:
+
+curl -X POST http://localhost:3000/auth/login -H "Content-Type: application/json" -d "{\"email\":\"YOUR_EMAIL@example.com\",\"password\":\"password123\"}"
+
+{"message":"OTP sent","loginSessionId":"xowsvq","otp":629188}
+
+-----------------------------------------------------------------
+
+EndPoint: POST /auth/verify-otp
+
+curl -c cookies.txt -X POST http://localhost:3000/auth/verify-otp -H "Content-Type: application/json" -d "{\"loginSessionId\":\"xowsvq\",\"otp\":\"629188\"}"
+
+{"message":"OTP verified","sessionId":"xowsvq"}
+
+
+-----------------------------------------------------------------
+
+EndPoint: POST /auth/token
+
+curl -b cookies.txt -X POST http://localhost:3000/auth/token
+
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IllPVVJfRU1BSUxAZXhhbXBsZS5jb20iLCJzZXNzaW9uSWQiOiJ4b3dzdnEiLCJpYXQiOjE3NzA5MDQ3MjgsImV4cCI6MTc3MDkwNTYyOH0.BIRMBOApDkAZW6DWW-WwbJsvGq0v41RG5aiIuL3BT5k","expires_in":900}
+
+-----------------------------------------------------------------
+
+EndPoint: GET /protected
+
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IllPVVJfRU1BSUxAZXhhbXBsZS5jb20iLCJzZXNzaW9uSWQiOiJ4b3dzdnEiLCJpYXQiOjE3NzA5MDQ3MjgsImV4cCI6MTc3MDkwNTYyOH0.BIRMBOApDkAZW6DWW-WwbJsvGq0v41RG5aiIuL3BT5k" http://localhost:3000/protected
+
+{"message":"Access granted","user":{"email":"YOUR_EMAIL@example.com","sessionId":"xowsvq","iat":1770904728,"exp":1770905628},"success_flag":"FLAG-WU9VUl9FTUFJTEBleGFtcGxlLmNvbV9DT01QTEVURURfQVNTSUdOTUVOVA=="}
