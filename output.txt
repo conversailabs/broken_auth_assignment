@@ -1,0 +1,35 @@
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"tpranav006@gmail.com","password":"password123"}'
+
+
+  [OTP] Session 211tk9 generated. OTP: 627388
+  {"message":"OTP sent","loginSessionId":"211tk9"}
+
+
+
+curl -c cookies.txt -X POST http://localhost:3000/auth/verify-otp \
+  -H "Content-Type: application/json" \
+  -d '{"loginSessionId":"211tk9","otp":"627388"}'
+
+
+  {"message":"OTP verified","sessionId":"211tk9"}
+
+
+
+
+# Uses the cookie captured in Task 2
+curl -b cookies.txt -X POST http://localhost:3000/auth/token
+
+
+    XVCJ9.eyJlbWFpbCI6InRwcmFuYXYwMDZAZ21haWwuY29tIiwic2Vzc2lvbklkIjoiMjExdGs5IiwiaWF0IjoxNzcwODgxNjE3LCJleHAiOjE3NzA4ODI1MTd9.YCAAMt_61nqb4BKtRqGB4GsTuM0R57I1nuyC6BN-bQ0","expires_in":900}
+
+
+
+# Replace <jwt> with the token from Task 3
+curl -H "Authorization: Bearer <jwt>" http://localhost:3000/protected
+
+   # Replace <jwt> with the token from Task 3
+    curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRwcmFuYXYwMDZAZ21haWwuY29tIiwic2Vzc2lvbklkIjoiMjExdGs5IiwiaWF0IjoxNzcwODgxNzE3LCJleHAiOjE3NzA4ODI2MTd9.gBReDlCMTEtEFQeRX8ise3tPb1pXNo180i7uMCc5xfM" http://localhost:3000/protected
+
+    {"message":"Access granted","user":{"email":"tpranav006@gmail.com","sessionId":"211tk9","iat":1770881717,"exp":1770882617},"success_flag":"FLAG-dHByYW5hdjAwNkBnbWFpbC5jb21fQ09NUExFVEVEX0FTU0lHTk1FTlQ="}
