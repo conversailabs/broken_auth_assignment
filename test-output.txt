@@ -1,0 +1,62 @@
+======================================================================
+AUTHENTICATION FLOW DEBUG & TEST
+======================================================================
+
+TASK 1: LOGIN
+----------------------------------------------------------------------
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"deepak@example.com","password":"password123"}'
+
+Response Status: 200
+Response Body:
+{"message":"OTP sent","loginSessionId":"oubla"}
+
+Extracted loginSessionId: oubla
+
+Note: Check server console output for [OTP] message
+The OTP value is logged by the server but not returned in the response.
+
+----------------------------------------------------------------------
+
+TASK 2: VERIFY OTP
+----------------------------------------------------------------------
+curl -c cookies.txt -X POST http://localhost:3000/auth/verify-otp \
+  -H "Content-Type: application/json" \
+  -d '{"loginSessionId":"oubla","otp":"<OTP_FROM_SERVER_LOG>"}'
+
+INSTRUCTIONS:
+1. Look at the server output above for a message like: [OTP] Session xxx generated
+2. The OTP is a 6-digit number
+3. Replace <OTP_FROM_SERVER_LOG> with the actual OTP and run the command
+4. This will create a cookies.txt file with the session cookie
+
+----------------------------------------------------------------------
+
+TESTING WITH SAMPLE OTP (123456):
+
+Response Status: 401
+Response Body:
+{"error":"Invalid OTP"}
+
+(This will likely fail because OTP is incorrect)
+
+----------------------------------------------------------------------
+
+TASK 3: GET ACCESS TOKEN
+----------------------------------------------------------------------
+curl -b cookies.txt -X POST http://localhost:3000/auth/token
+
+This command requires cookies.txt created in Task 2
+
+----------------------------------------------------------------------
+
+TASK 4: ACCESS PROTECTED ROUTE
+----------------------------------------------------------------------
+curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:3000/protected
+
+This command requires the JWT token from Task 3
+The response should contain a success_flag in the format:
+FLAG-<base64_encoded_email_COMPLETED_ASSIGNMENT>
+
+----------------------------------------------------------------------
