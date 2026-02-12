@@ -1,0 +1,58 @@
+======================================================================
+COMPLETE AUTHENTICATION FLOW TEST
+======================================================================
+
+══════════════════════════════════════════════════════════════════════
+TASK 1: LOGIN
+══════════════════════════════════════════════════════════════════════
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"deepak@example.com","password":"password123"}'
+
+HTTP/1.1 200
+{"message":"OTP sent","loginSessionId":"tuhpg"}
+
+Session ID obtained: tuhpg
+
+══════════════════════════════════════════════════════════════════════
+TASK 2: VERIFY OTP
+══════════════════════════════════════════════════════════════════════
+GET /debug/otp/tuhpg
+
+HTTP/1.1 200
+{"otp":495120}
+
+OTP obtained: 495120
+
+curl -c cookies.txt -X POST http://localhost:3000/auth/verify-otp \
+  -H "Content-Type: application/json" \
+  -d '{"loginSessionId":"tuhpg","otp":"495120"}'
+
+HTTP/1.1 200
+{"message":"OTP verified","sessionId":"tuhpg"}
+
+Cookie received: session_token=tuhpg
+
+══════════════════════════════════════════════════════════════════════
+TASK 3: GET ACCESS TOKEN
+══════════════════════════════════════════════════════════════════════
+curl -b cookies.txt -X POST http://localhost:3000/auth/token
+
+HTTP/1.1 200
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRlZXBha0BleGFtcGxlLmNvbSIsInNlc3Npb25JZCI6InR1aHBnIiwiaWF0IjoxNzcwOTMyMjQ3LCJleHAiOjE3NzA5MzMxNDd9.lHm94Pzfc3tau-IqIN3if-5G4a8-cd1RvOMTfmNwLd0","expires_in":900}
+
+
+══════════════════════════════════════════════════════════════════════
+TASK 4: ACCESS PROTECTED ROUTE
+══════════════════════════════════════════════════════════════════════
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRlZXBha0BleGFtcGxlLmNvbSIsInNlc3Npb25JZCI6InR1aHBnIiwiaWF0IjoxNzcwOTMyMjQ3LCJleHAiOjE3NzA5MzMxNDd9.lHm94Pzfc3tau-IqIN3if-5G4a8-cd1RvOMTfmNwLd0" http://localhost:3000/protected
+
+HTTP/1.1 200
+{"message":"Access granted","user":{"email":"deepak@example.com","sessionId":"tuhpg","iat":1770932247,"exp":1770933147},"success_flag":"FLAG-ZGVlcGFrQGV4YW1wbGUuY29tX0NPTVBMRVRFRF9BU1NJR05NRU5U"}
+
+SUCCESS FLAG:
+FLAG-ZGVlcGFrQGV4YW1wbGUuY29tX0NPTVBMRVRFRF9BU1NJR05NRU5U
+
+══════════════════════════════════════════════════════════════════════
+TEST COMPLETE
+══════════════════════════════════════════════════════════════════════
