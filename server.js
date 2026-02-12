@@ -15,6 +15,7 @@ const otpStore = {};
 // Middleware
 app.use(requestLogger);
 app.use(express.json());
+app.use(cookieParser());
 
 
 app.get("/", (req, res) => {
@@ -50,6 +51,7 @@ app.post("/auth/login", (req, res) => {
     otpStore[loginSessionId] = otp;
 
     console.log(`[OTP] Session ${loginSessionId} generated`);
+    console.log(`[OTP] ${otp}`);
 
     return res.status(200).json({
       message: "OTP sent",
@@ -109,7 +111,7 @@ app.post("/auth/verify-otp", (req, res) => {
 
 app.post("/auth/token", (req, res) => {
   try {
-    const token = req.headers.authorization;
+    const token = req.cookies.session_token;
 
     if (!token) {
       return res
@@ -117,7 +119,7 @@ app.post("/auth/token", (req, res) => {
         .json({ error: "Unauthorized - valid session required" });
     }
 
-    const session = loginSessions[token.replace("Bearer ", "")];
+    const session = loginSessions[token];
 
     if (!session) {
       return res.status(401).json({ error: "Invalid session" });
