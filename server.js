@@ -84,7 +84,7 @@ app.post("/auth/verify-otp", (req, res) => {
       return res.status(401).json({ error: "Session expired" });
     }
 
-    if (parseInt(otp) !== otpStore[loginSessionId]) {
+    if (parseInt(otp, 10) !== otpStore[loginSessionId]) {
       return res.status(401).json({ error: "Invalid OTP" });
     }
 
