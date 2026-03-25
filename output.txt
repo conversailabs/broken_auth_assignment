@@ -1,0 +1,38 @@
+#login
+
+{
+  "message": "OTP sent",
+  "otp": 195491,
+  "loginSessionId": "fd9poj"
+}
+
+
+#verifyotp
+
+
+{
+  "message": "OTP sent",
+  "otp": 195491,
+  "loginSessionId": "fd9poj"
+}
+
+
+#Get Token
+
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImF5YW5zaGFybWEyMDA2Z21haWwuY29tIiwic2Vzc2lvbklkIjoiQmVhcmVyIGZkOXBvaiIsImlhdCI6MTc3NDQ0NzM2NywiZXhwIjoxNzc0NDQ4MjY3fQ.pN3-2SK0ihed6O67whWy4WcTcDVoURUhtm4vHdgev9Q",
+  "expires_in": 900
+}
+
+#Access Protected Route
+
+{
+  "message": "Access granted",
+  "user": {
+    "email": "ayansharma2006gmail.com",
+    "sessionId": "Bearer fd9poj",
+    "iat": 1774447367,
+    "exp": 1774448267
+  },
+  "success_flag": "FLAG-YXlhbnNoYXJtYTIwMDZnbWFpbC5jb21fQ09NUExFVEVEX0FTU0lHTk1FTlQ="
+}

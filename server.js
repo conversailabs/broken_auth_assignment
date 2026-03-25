@@ -4,9 +4,10 @@ const jwt = require("jsonwebtoken");
 const requestLogger = require("./middleware/logger");
 const authMiddleware = require("./middleware/auth");
 const { generateToken } = require("./utils/tokenGenerator");
+require('dotenv').config()
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 // Session storage (in-memory)
 const loginSessions = {};
@@ -15,10 +16,10 @@ const otpStore = {};
 // Middleware
 app.use(requestLogger);
 app.use(express.json());
-
+app.use(cookieParser())
 
 app.get("/", (req, res) => {
-  res.json({
+  return res.json({
     challenge: "Complete the Authentication Flow",
     instruction:
       "Complete the authentication flow and obtain a valid access token.",
@@ -53,6 +54,7 @@ app.post("/auth/login", (req, res) => {
 
     return res.status(200).json({
       message: "OTP sent",
+      otp:otp,
       loginSessionId,
     });
   } catch (error) {
@@ -111,7 +113,7 @@ app.post("/auth/token", (req, res) => {
   try {
     const token = req.headers.authorization;
 
-    if (!token) {
+    if (!token) { 
       return res
         .status(401)
         .json({ error: "Unauthorized - valid session required" });
